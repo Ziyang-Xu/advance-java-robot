@@ -50,7 +50,7 @@ public class Robot extends Component {
 		targetComponents = new ArrayList<>();
 		currTargetComponent = null;
 		currentPathPositionsIter = null;
-		speed = 5;
+		speed = 1;
 		blocked = false;
 		nextPosition = null;
 	}
@@ -127,46 +127,46 @@ public class Robot extends Component {
 		return otherRobot != null && getPosition().equals(otherRobot.getNextPosition());
 	}
 
-	private int moveToNextPathPosition() {
-		int displacement = 0;
-		while (true) {
-			final Motion motion = computeMotion();
-			displacement = motion == null ? 0 : motion.moveToTarget();
-
-			if (displacement != 0) {
-				notifyObservers();
-				break;
-			} else if (isLivelyLocked()) {
-				Position freeNeighbouringPosition;
-				do {
-					freeNeighbouringPosition = findFreeNeighbouringPosition();
-					if (freeNeighbouringPosition != null) {
-						nextPosition = freeNeighbouringPosition;
-						computePathToCurrentTargetComponent();
-						displacement = moveToNextPathPosition();
-					}
-				} while (isLivelyLocked() && freeNeighbouringPosition != null);
-			} else {
-				break;
-			}
-		}
-		return displacement;
-	}
-
-	private Position findFreeNeighbouringPosition() {
+	private void findFreeNeighbouringPosition(int index) {
 		Position currentPosition = getPosition();
 		List<Position> possiblePositions = List.of(
 				new Position(currentPosition.getxCoordinate(), currentPosition.getyCoordinate() + 2 * this.getWidth()),
 				new Position(currentPosition.getxCoordinate(), currentPosition.getyCoordinate() - 2 * this.getWidth()),
 				new Position(currentPosition.getxCoordinate() - 2 * this.getWidth(), currentPosition.getyCoordinate()),
 				new Position(currentPosition.getxCoordinate() + 2 * this.getWidth(), currentPosition.getyCoordinate()));
+		if (getFactory().getMobileComponentAt(possiblePositions.get(index), this) == null) {
+			nextPosition = possiblePositions.get(index);
+		}
+		return;
+	}
 
-		for (Position pos : possiblePositions) {
-			if (getFactory().getMobileComponentAt(pos, this) == null) {
-				return pos;
+	private int moveToNextPathPosition() {
+		final Motion motion = computeMotion();
+		int displacement = motion == null ? 0 : motion.moveToTarget();
+
+		if (displacement != 0) {
+			notifyObservers();
+		} else if (isLivelyLocked()) {
+			boolean moved = false;
+			while (!moved) {
+				for (int index = 0; index < 4; index++) {
+					findFreeNeighbouringPosition(index);
+					if (nextPosition != null) {
+						Motion nextMotion = computeMotion();
+						if (nextMotion != null && nextMotion.moveToTarget() != 0) {
+							displacement = 1;
+							moved = true;
+							notifyObservers();
+							break;
+						}
+					}
+				}
+				if (!moved && !isLivelyLocked()) {
+					break;
+				}
 			}
 		}
-		return null;
+		return displacement;
 	}
 
 	private void computePathToCurrentTargetComponent() {

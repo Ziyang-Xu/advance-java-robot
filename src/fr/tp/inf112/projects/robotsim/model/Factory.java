@@ -9,6 +9,7 @@ import fr.tp.inf112.projects.canvas.controller.Observer;
 import fr.tp.inf112.projects.canvas.model.Canvas;
 import fr.tp.inf112.projects.canvas.model.Figure;
 import fr.tp.inf112.projects.canvas.model.Style;
+import fr.tp.inf112.projects.robotsim.model.motion.Motion;
 import fr.tp.inf112.projects.robotsim.model.shapes.PositionedShape;
 import fr.tp.inf112.projects.robotsim.model.shapes.RectangularShape;
 
@@ -99,17 +100,9 @@ public class Factory extends Component implements Canvas, Observable {
 		if (!isSimulationStarted()) {
 			this.simulationStarted = true;
 			notifyObservers();
-
-			while (isSimulationStarted()) {
-				behave();
-
-				try {
-					Thread.sleep(100);
-				} catch (final InterruptedException ex) {
-					System.err.println("Simulation was abruptely interrupted");
-				}
-			}
+			behave();
 		}
+
 	}
 
 	public void stopSimulation() {
@@ -125,7 +118,9 @@ public class Factory extends Component implements Canvas, Observable {
 		boolean behaved = true;
 
 		for (final Component component : getComponents()) {
-			behaved = component.behave() || behaved;
+			Thread componentThread = new Thread(component);
+			componentThread.start();
+			behaved = true; // Set to true as threads are started
 		}
 
 		return behaved;
@@ -163,5 +158,18 @@ public class Factory extends Component implements Canvas, Observable {
 			}
 		}
 		return null;
+	}
+
+	public synchronized int moveComponent(final Motion motion, final Robot componentToMove) {
+		if (motion == null) {
+			return 0;
+		}
+
+		Position targetPosition = motion.getTargetPosition();
+		if (getMobileComponentAt(targetPosition, componentToMove) == null) {
+			return motion.moveToTarget();
+		}
+
+		return 0;
 	}
 }
