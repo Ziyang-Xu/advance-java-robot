@@ -15,31 +15,28 @@ import fr.tp.inf112.projects.robotsim.model.shapes.RectangularShape;
 public class Factory extends Component implements Canvas, Observable {
 
 	private static final long serialVersionUID = 5156526483612458192L;
-	
+
 	private static final ComponentStyle DEFAULT = new ComponentStyle(5.0f);
 
-
-    private final List<Component> components;
+	private final List<Component> components;
 
 	private transient List<Observer> observers;
 
 	private transient boolean simulationStarted;
-	
-	public Factory(final int width,
-				   final int height,
-				   final String name ) {
+
+	public Factory(final int width, final int height, final String name) {
 		super(null, new RectangularShape(0, 0, width, height), name);
-		
+
 		components = new ArrayList<>();
 		observers = null;
 		simulationStarted = false;
 	}
-	
+
 	protected List<Observer> getObservers() {
 		if (observers == null) {
 			observers = new ArrayList<>();
 		}
-		
+
 		return observers;
 	}
 
@@ -52,30 +49,30 @@ public class Factory extends Component implements Canvas, Observable {
 	public boolean removeObserver(Observer observer) {
 		return getObservers().remove(observer);
 	}
-	
+
 	protected void notifyObservers() {
 		for (final Observer observer : getObservers()) {
 			observer.modelChanged();
 		}
 	}
-	
+
 	public boolean addComponent(final Component component) {
 		if (components.add(component)) {
 			notifyObservers();
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	public boolean removeComponent(final Component component) {
 		if (components.remove(component)) {
 			notifyObservers();
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -93,7 +90,7 @@ public class Factory extends Component implements Canvas, Observable {
 	public String toString() {
 		return super.toString() + " components=" + components + "]";
 	}
-	
+
 	public boolean isSimulationStarted() {
 		return simulationStarted;
 	}
@@ -105,11 +102,10 @@ public class Factory extends Component implements Canvas, Observable {
 
 			while (isSimulationStarted()) {
 				behave();
-				
+
 				try {
 					Thread.sleep(100);
-				}
-				catch (final InterruptedException ex) {
+				} catch (final InterruptedException ex) {
 					System.err.println("Simulation was abruptely interrupted");
 				}
 			}
@@ -119,7 +115,7 @@ public class Factory extends Component implements Canvas, Observable {
 	public void stopSimulation() {
 		if (isSimulationStarted()) {
 			this.simulationStarted = false;
-			
+
 			notifyObservers();
 		}
 	}
@@ -127,37 +123,45 @@ public class Factory extends Component implements Canvas, Observable {
 	@Override
 	public boolean behave() {
 		boolean behaved = true;
-		
+
 		for (final Component component : getComponents()) {
 			behaved = component.behave() || behaved;
 		}
-		
+
 		return behaved;
 	}
-	
+
 	@Override
 	public Style getStyle() {
 		return DEFAULT;
 	}
-	
+
 	public boolean hasObstacleAt(final PositionedShape shape) {
 		for (final Component component : getComponents()) {
 			if (component.overlays(shape) && !component.canBeOverlayed(shape)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	public boolean hasMobileComponentAt(final PositionedShape shape,
-										final Component movingComponent) {
+
+	public boolean hasMobileComponentAt(final PositionedShape shape, final Component movingComponent) {
 		for (final Component component : getComponents()) {
 			if (component != movingComponent && component.isMobile() && component.overlays(shape)) {
 				return true;
 			}
 		}
-		
+
 		return false;
+	}
+
+	public Component getMobileComponentAt(Position nextPosition, Robot robot) {
+		for (final Component component : getComponents()) {
+			if (component != robot && component.isMobile() && component.getPosition().equals(nextPosition)) {
+				return component;
+			}
+		}
+		return null;
 	}
 }
