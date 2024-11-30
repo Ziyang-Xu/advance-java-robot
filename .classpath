@@ -10,5 +10,23 @@
 	<classpathentry kind="lib" path="libs/jgrapht/lib/jheaps-0.14.jar"/>
 	<classpathentry kind="lib" path="libs/graph.jar"/>
 	<classpathentry kind="lib" path="libs/canvas-viewer.jar" sourcepath="libs/canvas-viewer.jar"/>
+	<classpathentry kind="lib" path="/Users/Chaleur/.m2/repository/org/springframework/spring-web/6.2.0/spring-web-6.2.0.jar" sourcepath="/Users/Chaleur/.m2/repository/org/springframework/spring-web/6.2.0/spring-web-6.2.0-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+			<attribute name="maven.artifactId" value="spring-web"/>
+			<attribute name="maven.version" value="6.2.0"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/Chaleur/.m2/repository/org/springframework/spring-beans/6.2.0/spring-beans-6.2.0.jar" sourcepath="/Users/Chaleur/.m2/repository/org/springframework/spring-beans/6.2.0/spring-beans-6.2.0-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+			<attribute name="maven.artifactId" value="spring-beans"/>
+			<attribute name="maven.version" value="6.2.0"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

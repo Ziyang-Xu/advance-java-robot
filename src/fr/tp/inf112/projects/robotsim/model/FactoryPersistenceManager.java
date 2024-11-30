@@ -65,4 +65,19 @@ public class FactoryPersistenceManager extends AbstractCanvasPersistenceManager 
 		
 		return canvasFile.delete();
 	}
+
+
+public Factory loadFactory(String id) {
+    try (
+        final InputStream fileInputStream = new FileInputStream(id);
+        final InputStream bufInputStream = new BufferedInputStream(fileInputStream);
+        final ObjectInputStream objectInputStream = new ObjectInputStream(bufInputStream);
+    ) {
+        return (Factory) objectInputStream.readObject();
+    } catch (ClassNotFoundException | IOException ex) {
+        ex.printStackTrace();
+        return null;
+    }
+}
+
 }
