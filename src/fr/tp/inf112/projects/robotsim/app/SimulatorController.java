@@ -5,18 +5,19 @@ import fr.tp.inf112.projects.canvas.controller.Observer;
 import fr.tp.inf112.projects.canvas.model.Canvas;
 import fr.tp.inf112.projects.canvas.model.CanvasPersistenceManager;
 import fr.tp.inf112.projects.robotsim.model.Factory;
+import fr.tp.inf112.projects.robotsim.model.RemoteFactoryPersistenceManager;
 
 public class SimulatorController implements CanvasViewerController {
 
 	private Factory factoryModel;
 
-	private final CanvasPersistenceManager persistenceManager;
+	private final RemoteFactoryPersistenceManager persistenceManager;
 
-	public SimulatorController(final CanvasPersistenceManager persistenceManager) {
+	public SimulatorController(final RemoteFactoryPersistenceManager persistenceManager) {
 		this(null, persistenceManager);
 	}
 
-	public SimulatorController(final Factory factoryModel, final CanvasPersistenceManager persistenceManager) {
+	public SimulatorController(final Factory factoryModel, final RemoteFactoryPersistenceManager persistenceManager) {
 		this.factoryModel = factoryModel;
 		this.persistenceManager = persistenceManager;
 	}
@@ -90,6 +91,6 @@ public class SimulatorController implements CanvasViewerController {
 	 */
 	@Override
 	public CanvasPersistenceManager getPersistenceManager() {
-		return persistenceManager;
+		return (CanvasPersistenceManager) persistenceManager;
 	}
 }
