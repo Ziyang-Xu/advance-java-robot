@@ -26,7 +26,7 @@ public class FactorySimulationController {
             Factory factory = factoryPersistenceManager.loadFactory(id);
             if (factory != null) {
                 simulatedFactories.put(id, factory);
-                // Start the simulation (this is a placeholder, implement your simulation logic here)
+                factory.startSimulation();
                 logger.info("Started simulation for factory ID: " + id);
                 return true;
             } else {
@@ -50,16 +50,19 @@ public class FactorySimulationController {
         return factory;
     }
 
-    @PostMapping("/stop/{id}")
-    public boolean stopSimulation(@PathVariable String id) {
-        if (simulatedFactories.containsKey(id)) {
-            simulatedFactories.remove(id);
-            // Stop the simulation (this is a placeholder, implement your stop logic here)
-            logger.info("Stopped simulation for factory ID: " + id);
-            return true;
-        } else {
-            logger.warning("No simulation found to stop for factory ID: " + id);
-            return false;
-        }
+
+@PostMapping("/stop/{id}")
+public boolean stopSimulation(@PathVariable String id) {
+    if (simulatedFactories.containsKey(id)) {
+        Factory factory = simulatedFactories.remove(id);
+        // Stop the simulation
+        factory.stopSimulation();
+        logger.info("Stopped simulation for factory ID: " + id);
+        return true;
+    } else {
+        logger.warning("No simulation found to stop for factory ID: " + id);
+        return false;
     }
+}
+
 }
