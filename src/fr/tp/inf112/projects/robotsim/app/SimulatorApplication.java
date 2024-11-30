@@ -15,9 +15,8 @@ import fr.tp.inf112.projects.robotsim.model.ChargingStation;
 import fr.tp.inf112.projects.robotsim.model.Conveyor;
 import fr.tp.inf112.projects.robotsim.model.Door;
 import fr.tp.inf112.projects.robotsim.model.Factory;
+import fr.tp.inf112.projects.robotsim.model.FactoryPersistenceManager;
 import fr.tp.inf112.projects.robotsim.model.Machine;
-import fr.tp.inf112.projects.robotsim.model.RemoteFactoryPersistenceManager;
-import fr.tp.inf112.projects.robotsim.model.RemoteFileCanvasChooser;
 import fr.tp.inf112.projects.robotsim.model.Robot;
 import fr.tp.inf112.projects.robotsim.model.Room;
 import fr.tp.inf112.projects.robotsim.model.path.CustomDijkstraFactoryPathFinder;
@@ -86,9 +85,9 @@ public class SimulatorApplication {
 
 			@Override
 			public void run() {
-				final FileCanvasChooser canvasChooser = new RemoteFileCanvasChooser("factory", "Puck Factory");
+				final FileCanvasChooser canvasChooser = new FileCanvasChooser("factory", "Puck Factory");
 				final Component factoryViewer = new CanvasViewer(
-						new SimulatorController(factory, new RemoteFactoryPersistenceManager(canvasChooser)));
+						new SimulatorController(factory, new FactoryPersistenceManager(canvasChooser)));
 				canvasChooser.setViewer(factoryViewer);
 				// new CanvasViewer(factory);
 			}
