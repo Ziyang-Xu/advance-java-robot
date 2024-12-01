@@ -2,6 +2,9 @@ package fr.tp.inf112.projects.robotsim.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import fr.tp.inf112.projects.canvas.model.Figure;
 import fr.tp.inf112.projects.canvas.model.Shape;
 import fr.tp.inf112.projects.canvas.model.Style;
@@ -9,151 +12,167 @@ import fr.tp.inf112.projects.robotsim.model.shapes.PositionedShape;
 
 public abstract class Component implements Figure, Serializable, Runnable {
 
-	private static final long serialVersionUID = -5960950869184030220L;
+    @JsonIgnore
+    private static final long serialVersionUID = -5960950869184030220L;
 
-	private String id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String id;
 
-	private final Factory factory;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Factory factory;
 
-	private final PositionedShape positionedShape;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final PositionedShape positionedShape;
 
-	private final String name;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String name;
 
-	protected Component(final Factory factory, final PositionedShape shape, final String name) {
-		this.factory = factory;
-		this.positionedShape = shape;
-		this.name = name;
+    protected Component(final Factory factory, final PositionedShape shape, final String name) {
+        this.factory = factory;
+        this.positionedShape = shape;
+        this.name = name;
 
-		if (factory != null) {
-			factory.addComponent(this);
-		}
-	}
+        if (factory != null) {
+            factory.addComponent(this);
+        }
+    }
 
-	public String getId() {
-		return id;
-	}
+    // Default constructor for Jackson
+    protected Component() {
+        this(null, null, null);
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public PositionedShape getPositionedShape() {
-		return positionedShape;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Position getPosition() {
-		return getPositionedShape().getPosition();
-	}
+    public PositionedShape getPositionedShape() {
+        return positionedShape;
+    }
 
-	protected Factory getFactory() {
-		return factory;
-	}
+    public Position getPosition() {
+        return getPositionedShape().getPosition();
+    }
 
-	@Override
-	public int getxCoordinate() {
-		return getPositionedShape().getxCoordinate();
-	}
+    @JsonIgnore
+    protected Factory getFactory() {
+        return factory;
+    }
 
-	protected boolean setxCoordinate(int xCoordinate) {
-		if (getPositionedShape().setxCoordinate(xCoordinate)) {
-			notifyObservers();
+    @Override
+    public int getxCoordinate() {
+        return getPositionedShape().getxCoordinate();
+    }
 
-			return true;
-		}
+    @JsonIgnore
+    protected boolean setxCoordinate(int xCoordinate) {
+        if (getPositionedShape().setxCoordinate(xCoordinate)) {
+            notifyObservers();
+            return true;
+        }
+        return false;
+    }
 
-		return false;
-	}
+    @Override
+    public int getyCoordinate() {
+        return getPositionedShape().getyCoordinate();
+    }
 
-	@Override
-	public int getyCoordinate() {
-		return getPositionedShape().getyCoordinate();
-	}
+    @JsonIgnore
+    protected boolean setyCoordinate(final int yCoordinate) {
+        if (getPositionedShape().setyCoordinate(yCoordinate)) {
+            notifyObservers();
+            return true;
+        }
+        return false;
+    }
 
-	protected boolean setyCoordinate(final int yCoordinate) {
-		if (getPositionedShape().setyCoordinate(yCoordinate)) {
-			notifyObservers();
+    @JsonIgnore
+    protected void notifyObservers() {
+        getFactory().notifyObservers();
+    }
 
-			return true;
-		}
+    public String getName() {
+        return name;
+    }
 
-		return false;
-	}
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [name=" + name + " xCoordinate=" + getxCoordinate() + ", yCoordinate="
+                + getyCoordinate() + ", shape=" + getPositionedShape();
+    }
 
-	protected void notifyObservers() {
-		getFactory().notifyObservers();
-	}
+    public int getWidth() {
+        return getPositionedShape().getWidth();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public int getHeight() {
+        return getPositionedShape().getHeight();
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + " [name=" + name + " xCoordinate=" + getxCoordinate() + ", yCoordinate="
-				+ getyCoordinate() + ", shape=" + getPositionedShape();
-	}
+    @JsonIgnore
+    public boolean behave() {
+        return false;
+    }
 
-	public int getWidth() {
-		return getPositionedShape().getWidth();
-	}
+    @JsonIgnore
+    public boolean isMobile() {
+        return false;
+    }
 
-	public int getHeight() {
-		return getPositionedShape().getHeight();
-	}
+    @JsonIgnore
+    public boolean overlays(final Component component) {
+        return overlays(component.getPositionedShape());
+    }
 
-	public boolean behave() {
-		return false;
-	}
+    @JsonIgnore
+    public boolean overlays(final PositionedShape shape) {
+        return getPositionedShape().overlays(shape);
+    }
 
-	public boolean isMobile() {
-		return false;
-	}
+    @JsonIgnore
+    public boolean canBeOverlayed(final PositionedShape shape) {
+        return false;
+    }
 
-	public boolean overlays(final Component component) {
-		return overlays(component.getPositionedShape());
-	}
+    @Override
+    public Style getStyle() {
+        return ComponentStyle.DEFAULT;
+    }
 
-	public boolean overlays(final PositionedShape shape) {
-		return getPositionedShape().overlays(shape);
-	}
+    @Override
+    public Shape getShape() {
+        return getPositionedShape();
+    }
 
-	public boolean canBeOverlayed(final PositionedShape shape) {
-		return false;
-	}
+    @JsonIgnore
+    public boolean isSimulationStarted() {
+        return getFactory().isSimulationStarted();
+    }
 
-	@Override
-	public Style getStyle() {
-		return ComponentStyle.DEFAULT;
-	}
+    @JsonIgnore
+    public boolean isLivelyLocked() {
+        return false;
+    }
 
-	@Override
-	public Shape getShape() {
-		return getPositionedShape();
-	}
+    @JsonIgnore
+    public Object getNextPosition() {
+        return null;
+    }
 
-	public boolean isSimulationStarted() {
-		return getFactory().isSimulationStarted();
-	}
-
-	public boolean isLivelyLocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public Object getNextPosition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void run() {
-		while (isSimulationStarted()) {
-			behave();
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-	}
+    @Override
+    public void run() {
+        while (isSimulationStarted()) {
+            behave();
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

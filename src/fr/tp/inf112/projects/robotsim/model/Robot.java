@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import fr.tp.inf112.projects.canvas.model.Style;
 import fr.tp.inf112.projects.canvas.model.impl.RGBColor;
 import fr.tp.inf112.projects.robotsim.model.motion.Motion;
@@ -12,6 +15,7 @@ import fr.tp.inf112.projects.robotsim.model.shapes.CircularShape;
 import fr.tp.inf112.projects.robotsim.model.shapes.PositionedShape;
 import fr.tp.inf112.projects.robotsim.model.shapes.RectangularShape;
 
+@JsonInclude(JsonInclude.Include.NON_NULL) // Include only non-null fields in JSON serialization
 public class Robot extends Component {
 
 	private static final long serialVersionUID = -1218857231970296747L;
@@ -20,23 +24,20 @@ public class Robot extends Component {
 
 	private static final Style BLOCKED_STYLE = new ComponentStyle(RGBColor.RED, RGBColor.BLACK, 3.0f,
 			new float[] { 4.0f });
-
+	
 	private final Battery battery;
-
 	private int speed;
-
 	private List<Component> targetComponents;
-
+	@JsonIgnore // Exclude from JSON serialization
 	private transient Iterator<Component> targetComponentsIterator;
-
 	private Component currTargetComponent;
 
+	@JsonIgnore // Exclude from JSON serialization
 	private transient Iterator<Position> currentPathPositionsIter;
 
+	@JsonIgnore // Exclude from JSON serialization
 	private transient boolean blocked;
-
 	private Position nextPosition;
-
 	private FactoryPathFinder pathFinder;
 
 	public Robot(final Factory factory, final FactoryPathFinder pathFinder, final CircularShape shape,
@@ -55,6 +56,12 @@ public class Robot extends Component {
 		nextPosition = null;
 	}
 
+	// Default constructor for Jackson
+	public Robot() {
+		this(null, null, null, null, null);
+	}
+
+	@JsonIgnore // Exclude from JSON serialization
 	@Override
 	public String toString() {
 		return super.toString() + " battery=" + battery + "]";

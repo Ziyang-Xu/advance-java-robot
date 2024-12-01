@@ -1,43 +1,54 @@
 package fr.tp.inf112.projects.robotsim.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import fr.tp.inf112.projects.robotsim.model.shapes.PositionedShape;
 import fr.tp.inf112.projects.robotsim.model.shapes.RectangularShape;
 
 public class ChargingStation extends Component {
-	
-	private static final long serialVersionUID = -154228412357092561L;
-	
-	private boolean charging;
 
-	public ChargingStation(final Room room,
-						   final RectangularShape shape,
-						   final String name) {
-		this(room.getFactory(), shape, name);
-	}
+    @JsonIgnore
+    private static final long serialVersionUID = -154228412357092561L;
 
-	public ChargingStation(final Factory factory,
-						   final RectangularShape shape,
-						   final String name) {
-		super(factory, shape, name);
-		
-		charging = false;
-	}
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private boolean charging;
 
-	@Override
-	public String toString() {
-		return super.toString() + "]";
-	}
+    public ChargingStation(final Room room,
+                           final RectangularShape shape,
+                           final String name) {
+        this(room.getFactory(), shape, name);
+    }
 
-	protected boolean isCharging() {
-		return charging;
-	}
+    public ChargingStation(final Factory factory,
+                           final RectangularShape shape,
+                           final String name) {
+        super(factory, shape, name);
+        charging = false;
+    }
 
-	protected void setCharging(boolean charging) {
-		this.charging = charging;
-	}
+    public ChargingStation() {
+        // Default constructor for Jackson
+        this((Factory) null, null, null);
+    }
 
-	@Override
-	public boolean canBeOverlayed(final PositionedShape shape) {
-		return true;
-	}
+    @Override
+    public String toString() {
+        return super.toString() + "]";
+    }
+
+    @JsonIgnore
+    protected boolean isCharging() {
+        return charging;
+    }
+
+    @JsonIgnore
+    protected void setCharging(boolean charging) {
+        this.charging = charging;
+    }
+
+    @Override
+    public boolean canBeOverlayed(final PositionedShape shape) {
+        return true;
+    }
 }

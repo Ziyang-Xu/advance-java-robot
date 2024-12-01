@@ -17,7 +17,6 @@ public class RemoteFactoryPersistenceManager {
 		this.serverAddress = serverAddress;
 		this.serverPort = serverPort;
 	}
-
 	public RemoteFactoryPersistenceManager(FileCanvasChooser canvasChooser) {
 		// TODO Auto-generated constructor stub
 	}
