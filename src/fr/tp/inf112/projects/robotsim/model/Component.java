@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import fr.tp.inf112.projects.canvas.model.Figure;
 import fr.tp.inf112.projects.canvas.model.Shape;
@@ -17,8 +18,9 @@ public abstract class Component implements Figure, Serializable, Runnable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
-
+    
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonBackReference
     private final Factory factory;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

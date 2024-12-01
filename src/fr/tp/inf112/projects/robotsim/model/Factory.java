@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import fr.tp.inf112.projects.canvas.controller.Observable;
@@ -25,6 +26,7 @@ public class Factory extends Component implements Canvas, Observable {
     private static final ComponentStyle DEFAULT = new ComponentStyle(5.0f);
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonManagedReference
     private final List<Component> components;
 
     @JsonIgnore
@@ -46,7 +48,7 @@ public class Factory extends Component implements Canvas, Observable {
     }
 
     @JsonIgnore
-    protected List<Observer> getObservers() {
+	public List<Observer> getObservers() {
         if (observers == null) {
             observers = new ArrayList<>();
         }
@@ -64,7 +66,7 @@ public class Factory extends Component implements Canvas, Observable {
     }
 
     @Override
-    protected void notifyObservers() {
+	public void notifyObservers() {
         for (final Observer observer : getObservers()) {
             observer.modelChanged();
         }
@@ -87,6 +89,7 @@ public class Factory extends Component implements Canvas, Observable {
     }
 
     @JsonIgnore
+    @JsonManagedReference
     protected List<Component> getComponents() {
         return components;
     }
