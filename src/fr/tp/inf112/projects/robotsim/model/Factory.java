@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import fr.tp.inf112.projects.canvas.controller.Observable;
 import fr.tp.inf112.projects.canvas.controller.Observer;
@@ -55,10 +56,14 @@ public class Factory extends Component implements Canvas, Observable {
         return observers;
     }
 
-    private LocalFactoryModelChangedNotifier notifier = new LocalFactoryModelChangedNotifier();
+    private FactoryModelChangedNotifier notifier;
 
-    public void setNotifier(LocalFactoryModelChangedNotifier notifier) {
+    public void setNotifier(FactoryModelChangedNotifier notifier) {
         this.notifier = notifier;
+    }
+
+    public void setKafkaNotifier(KafkaTemplate<String, Factory> simulationEventTemplate) {
+        this.notifier = new KafkaFactoryModelChangeNotifier(this, simulationEventTemplate);
     }
 
     @Override
@@ -73,7 +78,7 @@ public class Factory extends Component implements Canvas, Observable {
         if (notifier != null) {
             notifier.addObserver(observer);
         }
-		return simulationStarted;
+        return simulationStarted;
     }
 
     @Override
@@ -81,7 +86,7 @@ public class Factory extends Component implements Canvas, Observable {
         if (notifier != null) {
             notifier.removeObserver(observer);
         }
-		return simulationStarted;
+        return simulationStarted;
     }
 
     public boolean addComponent(final Component component) {
