@@ -1,12 +1,15 @@
 
 package fr.tp.inf112.projects.robotsim.app;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import consumer.FactorySimulationEventConsumer;
 import fr.tp.inf112.projects.canvas.controller.Observer;
 import fr.tp.inf112.projects.canvas.model.Canvas;
 import fr.tp.inf112.projects.canvas.model.CanvasPersistenceManager;
 import fr.tp.inf112.projects.robotsim.model.Factory;
-
+import fr.tp.inf112.projects.robotsim.model.LocalFactoryModelChangedNotifier;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,11 +22,17 @@ public class RemoteSimulatorController extends SimulatorController {
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final LocalFactoryModelChangedNotifier notifier;
+    private final FactorySimulationEventConsumer eventConsumer;
+    private boolean animationRunning;
 
     public RemoteSimulatorController(final CanvasPersistenceManager persistenceManager) {
         super(persistenceManager);
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.notifier = new LocalFactoryModelChangedNotifier();
+        this.eventConsumer = new FactorySimulationEventConsumer(this, objectMapper);
+        this.animationRunning = false;
     }
 
     @Override
@@ -32,6 +41,15 @@ public class RemoteSimulatorController extends SimulatorController {
             URI uri = new URI("http", null, "localhost", 8080, "/simulation/start", null, null);
             HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.noBody()).build();
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            this.animationRunning = true;
+            new Thread(() -> {
+				try {
+					eventConsumer.consumeMessages();
+				} catch (JsonMappingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}).start();
             updateViewer();
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,9 +62,14 @@ public class RemoteSimulatorController extends SimulatorController {
             URI uri = new URI("http", null, "localhost", 8080, "/simulation/stop", null, null);
             HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.noBody()).build();
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            this.animationRunning = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isAnimationRunning() {
+        return animationRunning;
     }
 
     private void updateViewer() throws InterruptedException, URISyntaxException, IOException {
@@ -72,5 +95,15 @@ public class RemoteSimulatorController extends SimulatorController {
             ((Factory) getCanvas()).addObserver(observer);
         }
         ((Factory) getCanvas()).notifyObservers();
+    }
+
+    public boolean addObserver(Observer observer) {
+        notifier.addObserver(observer);
+		return animationRunning;
+    }
+
+    public boolean removeObserver(Observer observer) {
+        notifier.removeObserver(observer);
+		return animationRunning;
     }
 }

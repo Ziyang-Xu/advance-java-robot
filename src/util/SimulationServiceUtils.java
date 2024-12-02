@@ -3,6 +3,8 @@ package util;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import fr.tp.inf112.projects.robotsim.model.Factory;
@@ -13,7 +15,7 @@ public class SimulationServiceUtils {
     private static final String AUTO_OFFSET_RESET = "earliest";
     private static final String TOPIC = "simulation-topic-";
 
-    public static String getTopicName(final Factory factoryModel) {
+    public static String getTopicName(final Factory factoryModel) throws URISyntaxException, IOException, InterruptedException {
         return TOPIC + factoryModel.getId();
     }
 

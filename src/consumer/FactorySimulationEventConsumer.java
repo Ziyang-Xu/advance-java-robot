@@ -36,37 +36,26 @@ public class FactorySimulationEventConsumer {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.consumer = new KafkaConsumer<>(props);
         String topicName = null;
-		try {
-			topicName = SimulationServiceUtils.getTopicName(controller.getFactory());
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            topicName = SimulationServiceUtils.getTopicName(controller.getFactory());
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         this.consumer.subscribe(Collections.singletonList(topicName));
     }
 
-    public void consumeMessages() {
+    public void consumeMessages() throws JsonMappingException {
         try {
             while (controller.isAnimationRunning()) {
                 final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (final ConsumerRecord<String, String> record : records) {
                     LOGGER.fine("Received JSON Factory text '" + record.value() + "'.");
                     Factory factory = null;
-					try {
-						factory = objectMapper.readValue(record.value(), Factory.class);
-					} catch (JsonMappingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (JsonProcessingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+                    try {
+                        factory = objectMapper.readValue(record.value(), Factory.class);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                     controller.setCanvas(factory);
                 }
             }
