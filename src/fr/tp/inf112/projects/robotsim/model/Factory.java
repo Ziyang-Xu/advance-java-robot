@@ -55,21 +55,33 @@ public class Factory extends Component implements Canvas, Observable {
         return observers;
     }
 
+    private LocalFactoryModelChangedNotifier notifier = new LocalFactoryModelChangedNotifier();
+
+    public void setNotifier(LocalFactoryModelChangedNotifier notifier) {
+        this.notifier = notifier;
+    }
+
+    @Override
+    public void notifyObservers() {
+        if (notifier != null) {
+            notifier.notifyObservers();
+        }
+    }
+
     @Override
     public boolean addObserver(Observer observer) {
-        return getObservers().add(observer);
+        if (notifier != null) {
+            notifier.addObserver(observer);
+        }
+		return simulationStarted;
     }
 
     @Override
     public boolean removeObserver(Observer observer) {
-        return getObservers().remove(observer);
-    }
-
-    @Override
-	public void notifyObservers() {
-        for (final Observer observer : getObservers()) {
-            observer.modelChanged();
+        if (notifier != null) {
+            notifier.removeObserver(observer);
         }
+		return simulationStarted;
     }
 
     public boolean addComponent(final Component component) {
@@ -178,5 +190,6 @@ public class Factory extends Component implements Canvas, Observable {
         }
         return 0;
     }
+    
 }
  
