@@ -57,7 +57,7 @@ public class RemoteSimulatorController extends SimulatorController {
         }
     }
 
-    private Factory getFactory() throws URISyntaxException, IOException, InterruptedException {
+    public Factory getFactory() throws URISyntaxException, IOException, InterruptedException {
         URI uri = new URI("http", null, "localhost", 8080, "/simulation/factory", null, null);
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
